@@ -7,6 +7,9 @@ import 'react-bootstrap-table2-paginator/dist/react-bootstrap-table2-paginator.m
 import BootstrapTable from 'react-bootstrap-table-next';
 import paginationFactory from 'react-bootstrap-table2-paginator';
 import filterFactory, { textFilter } from 'react-bootstrap-table2-filter';
+import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
+import moment from 'moment'
+import 'moment/locale/pt-br'
 
 const Container = styled.div`
     display: flex;
@@ -14,15 +17,31 @@ const Container = styled.div`
     justify-content: space-around;
 `;
 
+const TableContainer = styled.div`
+    display: flex;
+    justify-content: center;
+    flex-flow: column wrap;
+`;
+
+const { SearchBar } = Search;
+
 const columns = [
   {
     dataField: 'nome',
     text: 'Nome',
-    filter: textFilter()
   },{
     dataField: 'created_at',
     text: 'Data de Inscrição',
+    formatter: dateFormatter,
 }];
+
+function dateFormatter(cell, row){
+    return (
+        <span>
+            {moment(cell).locale('pt-br').format('ddd, D [de] MMMM [de] YYYY')}
+        </span>
+    )
+}
 
 const expandRow = {
     renderer: row => (
@@ -34,8 +53,8 @@ const expandRow = {
             <p><strong>Endereço: </strong>{row.endereco}</p>
         </div>
         <div className="info-box">
-            <p><strong>Data de Nascimento: </strong> {row.data}</p>
-            <p><strong>Data de Inscrição: </strong>{row.created_at}</p>
+            <p><strong>Data de Nascimento: </strong>{moment(row.data).locale('pt-br').format('ddd, D [de] MMMM [de] YYYY')}</p>
+            <p><strong>Data de Inscrição: </strong>{moment(row.created_at).locale('pt-br').format('ddd, D [de] MMMM [de] YYYY')}</p>
             <p><strong>E-mail: </strong>{row.email}</p>
             <p><strong>Telefone: </strong>{row.telefone}</p>
         </div>
@@ -65,18 +84,37 @@ export default class Subscribers extends Component {
     render() {
         return (
             <Container>
-                <BootstrapTable 
-                    bootstrap4
-                    hideSizePerPage={true}
-                    sizePerPageespecificar={10}
-                    keyField='id' 
-                    data={ this.state.subscribers } 
-                    columns={ columns } 
-                    expandRow={ expandRow }
-                    pagination={ paginationFactory() }
-                    striped
+                <ToolkitProvider
+                    keyField="id"
+                    data={ this.state.subscribers }
+                    columns={ columns }
+                    search
                     filter={ filterFactory() } 
-                />
+                >
+                {
+                    props => (
+                        <TableContainer>
+                            <h3>Listagem de Inscritos</h3>
+                            <SearchBar { ...props.searchProps }
+                                style={{ maxWidth: "800px", margin: "0 auto"}} 
+                                placeholder="Pesquisar"
+
+                            />
+                            <hr />
+                            <BootstrapTable
+                            { ...props.baseProps }
+                            bootstrap4
+                            hideSizePerPage={true}
+                            sizePerPageespecificar={10}
+                            pagination={ paginationFactory() }
+                            striped
+                            expandRow={ expandRow }
+                            />
+                        </TableContainer>
+                    )
+                }
+
+                </ToolkitProvider>
             </Container>
         );
     }

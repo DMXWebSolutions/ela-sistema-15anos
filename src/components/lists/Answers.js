@@ -17,8 +17,10 @@ const Container = styled.div`
 const columns = [
   {
     dataField: 'nome',
-    text: 'Nome',
-    filter: textFilter()
+    text: 'Nome ',
+    filter: textFilter({
+        placeholder: 'Pesquisar por nome'
+    }),
   }
 ];
 
@@ -42,7 +44,6 @@ export default class Subscribers extends Component {
             const response = await api.get('/subscribers')
             const subscribers = response.data.subscribers
             this.setState({ subscribers })
-            console.log(this.state.subscribers)
         } catch (error) {
             console.log(error)
         }
@@ -61,7 +62,7 @@ export default class Subscribers extends Component {
                     expandRow={ expandRow }
                     pagination={ paginationFactory() }
                     striped
-                    filter={ filterFactory() } 
+                    filter={ filterFactory() }
                 />
             </Container>
         );
